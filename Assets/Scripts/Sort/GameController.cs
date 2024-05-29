@@ -38,7 +38,7 @@ public class GameController : MonoBehaviour {
 	void Start () {
 		playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
 		enemyAI = GameObject.FindGameObjectWithTag("Enemy").GetComponent<EnemyAI>();
-		playerController.thisData.chuPaiState = ChuPaiState.MayChuPai;
+		playerController.thisData.curRound = RoundType.ChuPai;
 		isGetCard = true;
 		PlayerSendCard(4);
 		EnemySendCard(4);
@@ -48,24 +48,24 @@ public class GameController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		PlayerAndEnemyDataSwitch();
+		SwithchPlayerData();
 
         if (isGetCard)
         {
-			enemyAI.thisData.ThisCard(enemyAI.thisData.playerAndEnemy);
-			playerController.thisData.ThisCard(playerController.thisData.playerAndEnemy);
+			enemyAI.thisData.ThisCard(enemyAI.thisData.curPlayer);
+			playerController.thisData.ThisCard(playerController.thisData.curPlayer);
 			isGetCard = false;
         }
 	}
 
-	public void PlayerAndEnemyDataSwitch()
+	public void SwitchPlayerData()
     {
-        switch (playerController.thisData.chuPaiState)
+        switch (playerController.thisData.curRound)
         {
-			case ChuPaiState.Wait:
+			case RoundType.Wait:
 				playerSlider.value = playerTimer;
 				break;
-			case ChuPaiState.MayChuPai:
+			case RoundType.ChuPai:
 				playerSlider.value = playerTimer;
 				if(isPlayerSendCard == true)
                 {
@@ -76,25 +76,25 @@ public class GameController : MonoBehaviour {
 				playerBtn.SetActive(true);
                 if (playerTimer <= 0)
                 {
-                    if (playerController.thisData.thisCard.Count > playerController.thisData.currentHP)
+                    if (playerController.thisData.ownCardList.Count > playerController.thisData.currentHP)
                     {
 						InitPlayeAndEnemy();
 						isGetCard = true;
-						playerController.thisData.chuPaiState = ChuPaiState.QiPai;
+						playerController.thisData.curRound = RoundType.QiPai;
                     }
                     else
                     {
 						InitPlayeAndEnemy();
 						playerBtn.SetActive(false);
-						playerController.thisData.chuPaiState = ChuPaiState.Wait;
-						enemyAI.thisData.chuPaiState = ChuPaiState.MayChuPai;
+						playerController.thisData.curRound = RoundType.Wait;
+						enemyAI.thisData.curRound = RoundType.ChuPai;
 						isEnemySendCard = true;
 						isGetCard = true;
 						enemyTimer = 20;
 					}
                 }
 				break;
-			case ChuPaiState.NeedOutPai:
+			case RoundType.NeedOutPai:
 				playerSlider.value = playerNeedTimer;
 				playerNeedTimer -= Time.deltaTime;
 				playerBtn.SetActive(true);
@@ -108,28 +108,28 @@ public class GameController : MonoBehaviour {
 						playerNeedTimer = 0;
 						playerController.thisData.currentNeedOutCardName = "";
 						playerController.CardYesClick();
-						playerController.thisData.chuPaiState = ChuPaiState.MayChuPai;
+						playerController.thisData.curRound = RoundType.ChuPai;
                     }
                     else
                     {
 						playerNeedTimer = 0;
 						playerController.thisData.currentNeedOutCardName = "";
 						playerBtn.SetActive(false);
-						playerController.thisData.chuPaiState = ChuPaiState.Wait;
+						playerController.thisData.curRound = RoundType.Wait;
 					}
                 }
 				break;
-			case ChuPaiState.QiPai:
+			case RoundType.QiPai:
 				playerSlider.value = playerTimer;
-                if (playerController.thisData.thisCard.Count > playerController.thisData.currentHP)
+                if (playerController.thisData.ownCardList.Count > playerController.thisData.currentHP)
                 {
 
                 }
                 else
                 {
 					playerBtn.SetActive(false);
-					playerController.thisData.chuPaiState = ChuPaiState.Wait;
-					enemyAI.thisData.chuPaiState = ChuPaiState.MayChuPai;
+					playerController.thisData.curRound = RoundType.Wait;
+					enemyAI.thisData.curRound = RoundType.ChuPai;
 					isGetCard = true;
 					isEnemySendCard = true;
 					enemyTimer = 20;
@@ -138,12 +138,12 @@ public class GameController : MonoBehaviour {
 			default:
 				break;
 		}
-		switch (enemyAI.thisData.chuPaiState)
+		switch (enemyAI.thisData.curRound)
 		{
-			case ChuPaiState.Wait:
+			case RoundType.Wait:
 				enemySlider.value = enemyTimer;
 				break;
-			case ChuPaiState.MayChuPai:
+			case RoundType.ChuPai:
 				enemySlider.value = enemyTimer;
 				if(isEnemySendCard == true)
                 {
@@ -152,25 +152,25 @@ public class GameController : MonoBehaviour {
                 }
 				enemyTimer -= Time.deltaTime;
 				break;
-			case ChuPaiState.NeedOutPai:
+			case RoundType.NeedOutPai:
 				isGetCard = true;
 				break;
-			case ChuPaiState.QiPai:
-                if (enemyAI.thisData.thisCard.Count > enemyAI.thisData.currentHP)
+			case RoundType.QiPai:
+                if (enemyAI.thisData.ownCardList.Count > enemyAI.thisData.currentHP)
                 {
                     //敌人的弃牌
-                    if (enemyAI.thisData.thisCard[enemyAI.thisData.thisCard.Count - 1] != null)
+                    if (enemyAI.thisData.ownCardList[enemyAI.thisData.ownCardList.Count - 1] != null)
                     {
 						enemyAI.thisData.OutCardMoveTarGetPos
-							(enemyAI.thisData.thisCard[enemyAI.thisData.thisCard.Count - 1]);
+							(enemyAI.thisData.ownCardList[enemyAI.thisData.ownCardList.Count - 1]);
                     }
                 }
                 else
                 {
 					InitPlayeAndEnemy();
 					isGetCard = true;
-					enemyAI.thisData.chuPaiState = ChuPaiState.Wait;
-					playerController.thisData.chuPaiState = ChuPaiState.MayChuPai;
+					enemyAI.thisData.curRound = RoundType.Wait;
+					playerController.thisData.curRound = RoundType.ChuPai;
 					playerController.CardYesClick();
 					isPlayerSendCard = true;
 					playerTimer = 20;
@@ -215,7 +215,7 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	public void PlayerOutCard()
     {
-		if(playerController.thisData.chuPaiState == ChuPaiState.MayChuPai && 
+		if(playerController.thisData.curRound == RoundType.ChuPai && 
 			playerController.thisData.currrentClickCardGo != null)
         {
 			isGetCard = true;
@@ -223,12 +223,12 @@ public class GameController : MonoBehaviour {
 			playerNeedTimer = 0;
 			playerController.thisData.OutCrad(playerController.thisData.currrentClickCardGo);
 		}
-		if (playerController.thisData.chuPaiState == ChuPaiState.QiPai &&
+		if (playerController.thisData.curRound == RoundType.QiPai &&
 			playerController.thisData.currrentClickCardGo != null)
 		{
 			playerController.thisData.DisCard(playerController.thisData.currrentClickCardGo.name);
 		}
-		if (playerController.thisData.chuPaiState == ChuPaiState.NeedOutPai &&
+		if (playerController.thisData.curRound == RoundType.NeedOutPai &&
 			playerController.thisData.currrentClickCardGo != null)
 		{
 			isGetCard = true;
@@ -241,14 +241,14 @@ public class GameController : MonoBehaviour {
 				playerController.thisData.currentNeedOutCardName = "";
 				playerController.CardYesClick();
 				playerBtn.SetActive(false);
-				playerController.thisData.chuPaiState = ChuPaiState.MayChuPai;
+				playerController.thisData.curRound = RoundType.ChuPai;
             }
             else
             {
 				playerNeedTimer = 0;
 				playerController.thisData.currentNeedOutCardName = "";
 				playerBtn.SetActive(false);
-				playerController.thisData.chuPaiState = ChuPaiState.Wait;
+				playerController.thisData.curRound = RoundType.Wait;
 			}
 		}
 
@@ -258,7 +258,7 @@ public class GameController : MonoBehaviour {
 	/// </summary>
 	public void PlayerOutOff()
     {
-		if(playerController.thisData.chuPaiState == ChuPaiState.NeedOutPai)
+		if(playerController.thisData.curRound == RoundType.NeedOutPai)
         {
 			playerController.thisData.isNeedOutCard = false;
 			playerController.thisData.isOutWuXie = false;
@@ -269,14 +269,14 @@ public class GameController : MonoBehaviour {
 				playerController.thisData.currentNeedOutCardName = "";
 				playerController.CardYesClick();
 				playerNeedTimer = 0;
-				playerController.thisData.chuPaiState = ChuPaiState.MayChuPai;
+				playerController.thisData.curRound = RoundType.ChuPai;
             }
             else
 			{
 				playerController.thisData.currentNeedOutCardName = "";
 				playerController.CardYesClick();
 				playerNeedTimer = 0;
-				playerController.thisData.chuPaiState = ChuPaiState.Wait;
+				playerController.thisData.curRound = RoundType.Wait;
 			}
         }
     }
@@ -286,9 +286,9 @@ public class GameController : MonoBehaviour {
 	public void PlayerEndOutCard()
     {
 		playerTimer = 0;
-		playerController.thisData.chuPaiState = ChuPaiState.QiPai;
+		playerController.thisData.curRound = RoundType.QiPai;
 
-		if (playerController.thisData.chuPaiState == ChuPaiState.NeedOutPai)
+		if (playerController.thisData.curRound == RoundType.NeedOutPai)
 		{
 			playerController.thisData.isNeedOutCard = false;
 			playerController.thisData.isOutWuXie = false;
@@ -299,14 +299,14 @@ public class GameController : MonoBehaviour {
 				playerController.thisData.currentNeedOutCardName = "";
 				playerController.CardYesClick();
 				playerNeedTimer = 0;
-				playerController.thisData.chuPaiState = ChuPaiState.MayChuPai;
+				playerController.thisData.curRound = RoundType.ChuPai;
 			}
 			else
 			{
 				playerController.thisData.currentNeedOutCardName = "";
 				playerController.CardYesClick();
 				playerNeedTimer = 0;
-				playerController.thisData.chuPaiState = ChuPaiState.Wait;
+				playerController.thisData.curRound = RoundType.Wait;
 			}
 		}
 	}

@@ -298,7 +298,7 @@ public class CharacterData : MonoBehaviour
                                 curRound = curRound.Wait;
                             }
                         }
-                        if (curRound == curRound.MayChuPai)
+                        if (curRound == RoundType.ChuPai)
                         {
                             if (_card.name == "Sha")
                             {
@@ -413,7 +413,7 @@ public class CharacterData : MonoBehaviour
     IEnumerator FunctionCard(string name)
     {
         yield return 0;
-        if (curPlayer == curPlayer.Player)
+        if (curPlayer == PlayerType.Player)
         {
             switch (name)
             {
@@ -421,7 +421,7 @@ public class CharacterData : MonoBehaviour
                     isJiu = true;
                     break;
                 case "Sha":
-                    if (curRound == curRound.MayChuPai && isJueDou == false && enemyAI.thisData.isJueDou == false)
+                    if (curRound == curRound.ChuPai && isJueDou == false && enemyAI.thisData.isJueDou == false)
                     {
                         if (isJiu == false)
                         {
@@ -548,7 +548,7 @@ public class CharacterData : MonoBehaviour
                     break;
             }
         }
-        if (curPlayer == curPlayer.Enemy)
+        if (curPlayer == PlayerType.Enemy)
         {
             switch (name)
             {
@@ -560,7 +560,7 @@ public class CharacterData : MonoBehaviour
                     {
                         playerController.EnemyPlayCard(name);
                     }
-                    if (curRound == curRound.MayChuPai)
+                    if (curRound == curRound.ChuPai)
                     {
                         playerController.EnemyPlayCard(name);
                     }
@@ -668,10 +668,10 @@ public class CharacterData : MonoBehaviour
     /// <param name="name"></param>
     /// <param name="equipType"></param>
     /// <param name="curPlayer"></param>
-    public void Equip(string name, EquipType equipType, curPlayer curPlayer)
+    public void Equip(string name, EquipType equipType, PlayerType curPlayer)
     {
         audioController.PlayAudio("ZhuangBei");
-        GameObject go = Instantiate(GetThisEquipCardGo(name));
+        GameObject go = Instantiate(GetEquipCard(name));
         go.name = name;
         Transform ts = null;
         switch (equipType)
