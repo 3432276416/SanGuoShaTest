@@ -195,7 +195,7 @@ public class GameController : MonoBehaviour {
     {
 		for(int i = 0; i < number; i++)
         {
-			cardController.SendCard(PlayerAndEnemy.Player);
+			cardController.SendCard(PlayerType.Player);
         }
 	}
 	/// <summary>
@@ -206,7 +206,7 @@ public class GameController : MonoBehaviour {
 	{
 		for (int i = 0; i < number; i++)
 		{
-			cardController.SendCard(PlayerAndEnemy.Enemy);
+			cardController.SendCard(PlayerType.Enemy);
 		}
 	}
 
@@ -216,23 +216,23 @@ public class GameController : MonoBehaviour {
 	public void PlayerOutCard()
     {
 		if(playerController.thisData.curRound == RoundType.ChuPai && 
-			playerController.thisData.currrentClickCardGo != null)
+			playerController.thisData.curClickCard != null)
         {
 			isGetCard = true;
 			playerTimer = 20;
 			playerNeedTimer = 0;
-			playerController.thisData.OutCrad(playerController.thisData.currrentClickCardGo);
+			playerController.thisData.OutCrad(playerController.thisData.curClickCard);
 		}
 		if (playerController.thisData.curRound == RoundType.QiPai &&
-			playerController.thisData.currrentClickCardGo != null)
+			playerController.thisData.curClickCard != null)
 		{
-			playerController.thisData.DisCard(playerController.thisData.currrentClickCardGo.name);
+			playerController.thisData.DisCard(playerController.thisData.curClickCard.name);
 		}
 		if (playerController.thisData.curRound == RoundType.NeedOutPai &&
-			playerController.thisData.currrentClickCardGo != null)
+			playerController.thisData.curClickCard != null)
 		{
 			isGetCard = true;
-			playerController.thisData.OutCrad(playerController.thisData.currrentClickCardGo);
+			playerController.thisData.OutCrad(playerController.thisData.curClickCard);
 			playerController.thisData.isNeedOutCard = true;
             if (enemyTimer <= 0)
             {
